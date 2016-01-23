@@ -1,0 +1,6 @@
+NAME: Window Identify
+DATE: 04/03/2012
+DESCRIPTION:
+ Control that allows user to identify a window or its children
+ by drag selection with the mouse
+ 
