@@ -46,7 +46,7 @@ public:
 		dllName[size] = 0;
 		// remove crap
 		RemoveCrap(dllName);
-		if(GetFileAttributes(dllName) != INVALID_FILE_ATTRIBUTES)
+		if(GetFileAttributesA(dllName) != INVALID_FILE_ATTRIBUTES)
 			return true;
 		return false;	
 	}
@@ -127,7 +127,7 @@ LRESULT CALLBACK ButtonProc(
 void SetDlgItemHex(HWND hwnd, DWORD ctrlID, DWORD data)
 {
 	char buff[16]; sprintf(buff, "0x%08X", data);
-	SetDlgItemText(hwnd, ctrlID, buff);
+	SetDlgItemTextA(hwnd, ctrlID, buff);
 }
 
 void hexView_addrcb(void* ctx, DWORD addr, DWORD data)
@@ -154,7 +154,7 @@ void hexView_resize(HWND hwnd, int width, int height)
 void hexView_setAddr(HWND hwnd)
 {
 	char buff[32];
-	GetDlgItemText(hwnd, IDC_ADDR, buff, 32);
+	GetDlgItemTextA(hwnd, IDC_ADDR, buff, 32);
 	hexView->setAddress(strtol(buff, 0, 16));
 }
 
@@ -186,7 +186,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			
 			// update the edit control
 			SetDlgItemHex(hwndDlg, IDC_HWND, (DWORD)lastHwnd);
-			SetDlgItemText(hwndDlg, IDC_CLASS, wInfo.className);
+			SetDlgItemTextA(hwndDlg, IDC_CLASS, wInfo.className);
 			SetDlgItemHex(hwndDlg, IDC_CTLID, wInfo.ctrlId);
 			SetDlgItemHex(hwndDlg, IDC_STYLE, wInfo.style);
 			SetDlgItemHex(hwndDlg, IDC_STYLEX, wInfo.exStyle);
@@ -194,10 +194,10 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			SetDlgItemHex(hwndDlg, IDC_DLGDAT, wInfo.dlgData);
 			SetDlgItemHex(hwndDlg, IDC_WNDPROC, wInfo.wndProc);
 			SetDlgItemHex(hwndDlg, IDC_DLGPROC, wInfo.dlgProc);
-			SetDlgItemText(hwndDlg, IDC_WNDMOD, wInfo.wndProcMod);
-			SetDlgItemText(hwndDlg, IDC_DLGMOD, wInfo.dlgProcMod);
-			SetDlgItemText(hwndDlg, IDC_PROCESS, wInfo.procName);
-			SetDlgItemText(hwndDlg, IDC_INSTANCE, wInfo.modName);
+			SetDlgItemTextA(hwndDlg, IDC_WNDMOD, wInfo.wndProcMod);
+			SetDlgItemTextA(hwndDlg, IDC_DLGMOD, wInfo.dlgProcMod);
+			SetDlgItemTextA(hwndDlg, IDC_PROCESS, wInfo.procName);
+			SetDlgItemTextA(hwndDlg, IDC_INSTANCE, wInfo.modName);
 			
 			// update extra list
 			SetDlgItemHex(hwndDlg, IDC_EXTRA, wInfo.wndExtra);
@@ -255,7 +255,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 int main()
 {
 	DialogBox(GetModuleHandle(NULL), 
-		"IDD_DIALOG1", NULL, &DialogProc);
+		TEXT("IDD_DIALOG1"), NULL, &DialogProc);
 	printf("%d\n", GetLastError());
 	return 0;
 }

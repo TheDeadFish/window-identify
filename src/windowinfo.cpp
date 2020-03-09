@@ -12,7 +12,7 @@ struct INJDATA
 {
 	INJDATA(bool isDialog, HWND hwnd)
 	{
-		HMODULE hModule = GetModuleHandle("user32.dll");
+		HMODULE hModule = GetModuleHandleA("user32.dll");
 		gwlA = (typeof(&GetWindowLongPtr))
 			GetProcAddress(hModule, STRING(GetWindowLongPtrA));
 		gwlW = (typeof(&GetWindowLongPtr))
@@ -62,7 +62,7 @@ procModInfo(HANDLE hProcess, LONG_PTR& wndProc)
 		MEMORY_BASIC_INFORMATION mbi;
 		if(VirtualQueryEx( hProcess, (void*)wndProc, &mbi, sizeof(mbi)))
 		{
-			GetModuleFileNameEx(hProcess,
+			GetModuleFileNameExA(hProcess,
 				(HMODULE)mbi.AllocationBase, procMod, MAX_PATH);
 		}
 	}
@@ -81,8 +81,8 @@ HANDLE WindowInfo::get(HWND hwnd)
 	if(hProcess == NULL) return hProcess;
 		
 	// get wndProc/dlgProc address
-	GetClassName(hwnd, className, MAX_PATH);	
-	INJDATA injData(!lstrcmp(className, "#32770"), hwnd);
+	GetClassNameA(hwnd, className, MAX_PATH);	
+	INJDATA injData(!lstrcmpA(className, "#32770"), hwnd);
 	LPVOID pMemRemote = VirtualAllocEx(
 		hProcess, 0, sizeof(INJDATA)+THREADFUNC_SIZE,
 		MEM_COMMIT, PAGE_EXECUTE_READWRITE );
@@ -103,8 +103,8 @@ HANDLE WindowInfo::get(HWND hwnd)
 	
 	// get remaining information
 	HMODULE hModule = (HMODULE)GetWindowLongPtr(hwnd, GWL_HINSTANCE);
-	GetModuleFileNameEx(hProcess, 0, procName, MAX_PATH);
-	GetModuleFileNameEx(hProcess, hModule, modName, MAX_PATH);
+	GetModuleFileNameExA(hProcess, 0, procName, MAX_PATH);
+	GetModuleFileNameExA(hProcess, hModule, modName, MAX_PATH);
 	ctrlId = GetWindowLong(hwnd, GWLP_ID);
 	procModInfo(hProcess, wndProc);
 	procModInfo(hProcess, dlgProc);

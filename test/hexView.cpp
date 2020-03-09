@@ -2,6 +2,7 @@
 #define _HEXVIEW_H_
 #include <windows.h>
 #include <stdio.h>
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 struct HexView
 {
@@ -34,7 +35,7 @@ struct HexView
 HexView* HexView::create(HWND hwnd_, void* ctx_,
 	ReadDataCb datacb_, AddrChngCb addrcb_)
 {
-	return replace(CreateWindow("Message", NULL, WS_CHILD | WS_VISIBLE,
+	return replace(CreateWindow(TEXT("Message"), NULL, WS_CHILD | WS_VISIBLE,
 		0, 0, 0, 0, hwnd_, 0, 0, 0), ctx_, datacb_, addrcb_);
 }
 
@@ -45,7 +46,7 @@ HexView* HexView::replace(HWND hwnd_, void* ctx_,
 	HexView* This = (HexView*)malloc(sizeof(HexView));
 	HDC hdc = GetDC(hwnd_);
 	SelectObject(hdc, GetStockObject(OEM_FIXED_FONT));
-	GetTextExtentPoint32(hdc, " ", 1, &This->textSz);
+	GetTextExtentPoint32A(hdc, " ", 1, &This->textSz);
 	ReleaseDC(hwnd_, hdc);
 	This->hwnd = hwnd_; This->ctx = ctx_; 
 	This->datacb = datacb_; This->addrcb = addrcb_;
@@ -144,16 +145,16 @@ void HexView::drawHexLine(HDC hdc, int x, int y,
 {
 	char buff[16];
 	MoveToEx(hdc, x, y, 0); this->setColor(hdc, 0); 
-	TextOut(hdc, 0, 0, buff, sprintf(buff, "%08X |", addr));
+	TextOutA(hdc, 0, 0, buff, sprintf(buff, "%08X |", addr));
 	for(int i = 0; i < 16; i++) {
-		TextOut(hdc, 0, 0, (i == 8) ? "-" : " ", 1);
+		TextOutA(hdc, 0, 0, (i == 8) ? "-" : " ", 1);
 		if(i == cursor) this->setColor(hdc, focusCol); 
-		TextOut(hdc, 0, 0, buff, sprintf(buff, "%02X", data[i])); 
+		TextOutA(hdc, 0, 0, buff, sprintf(buff, "%02X", data[i])); 
 		if(i == cursor) this->setColor(hdc, 0); }
-	TextOut(hdc, 0, 0, " | ", 3);
+	TextOutA(hdc, 0, 0, " | ", 3);
 	for(int i = 0; i < 16; i++) { 
 		this->setColor(hdc, (i == cursor) ? focusCol : 0); 
-		buff[0] = data[i]; TextOut(hdc, 0, 0, buff, 1); }
+		buff[0] = data[i]; TextOutA(hdc, 0, 0, buff, 1); }
 }
 
 #endif

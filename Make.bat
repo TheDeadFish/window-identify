@@ -1,0 +1,2 @@
+call cmake_gcc
+

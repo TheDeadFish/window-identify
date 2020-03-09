@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define RESN(nm) ({ extern const WCHAR resn_##nm[]; resn_##nm; })
+
+
 BOOL CALLBACK  WinIdentify::WinCollide::WinCollProc(HWND _hwnd, LPARAM lParam)
 {
 	WinCollide* wc = (WinCollide*)lParam;
@@ -42,9 +45,10 @@ LRESULT CALLBACK WinIdentify::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 		CREATESTRUCT& cs = *(CREATESTRUCT*)lParam;
 		SetWindowLong(hwnd, GWL_USERDATA, (LONG)cs.lpCreateParams);
 		obj = (WinIdentify*)cs.lpCreateParams;
-		
+
 		// setup object
-		obj->hIcon = (HICON)LoadImage(hInst, "WinIdentify_Icon", IMAGE_ICON, 0, 0, 0);
+		obj->hIcon = (HICON)LoadImageW(hInst, 
+			RESN(WINIDENTIFY_ICON), IMAGE_ICON, 0, 0, 0);
 		obj->lastHwnd = NULL;
 		obj->mouseOver = false;
 		obj->winCol = NULL;
@@ -178,14 +182,14 @@ HWND WinIdentify::create(HWND parent, RECT& rc)
 		wc.hInstance 		= hInst;
 		wc.hCursor     		= LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground 	= (HBRUSH)(COLOR_WINDOW);
-		wc.lpszClassName 	= "WinIdentify";
+		wc.lpszClassName 	= TEXT("WinIdentify");
 		if(RegisterClass(&wc) == 0)
 		{
 			hInst = 0;
 			return NULL;
 		}
 	}
-	hwnd = CreateWindow("WinIdentify", "WinIdentify", WS_CHILD | WS_VISIBLE,
+	hwnd = CreateWindow(TEXT("WinIdentify"), TEXT("WinIdentify"), WS_CHILD | WS_VISIBLE,
 		rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, parent, NULL, hInst, this);
 	return hwnd;
 }
