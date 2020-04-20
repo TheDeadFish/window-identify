@@ -13,7 +13,7 @@ struct HexView
 	// public interface
 	HWND hwnd; enum { READ_LEN = 19 };
 	typedef void (*ReadDataCb)(void* ctx, ADDR_T addr, BYTE* data);
-	typedef void (*AddrChngCb)(void* ctx, ADDR_T addr, DWORD data);
+	typedef void (*AddrChngCb)(void* ctx, ADDR_T addr, ADDR_T data);
 	static HexView* create(HWND hwnd, void* ctx,
 		ReadDataCb datacb_, AddrChngCb addrcb_);
 	static HexView* replace(HWND hwnd, void* ctx,
@@ -136,7 +136,7 @@ void HexView::redraw(HDC hdc)
 		DWORD lineAddr = scrnAddr + i*16;
 		datacb(ctx, lineAddr, data);
 		unsigned cursor = curAddr-lineAddr;	if(cursor < 16) {
-			addrcb(ctx, curAddr, *(int*)(data+cursor)); }
+			addrcb(ctx, curAddr, *(ADDR_T*)(data+cursor)); }
 		drawHexLine(hdc, rect.left+2, (rect.top+2) +
 			i*textSz.cy, focusCol, cursor, lineAddr, data); 
 	} DrawEdge(hdc, &rect, BDR_SUNKENINNER | BDR_SUNKENOUTER, BF_RECT);	

@@ -37,7 +37,7 @@ static DWORD WINAPI ThreadFunc (INJDATA *pData)
 {
 	// get window procedures
 	pData->wndProc = pData->gwlA(pData->hwnd, GWLP_WNDPROC);
-	if(pData->wndProc < 0) 
+	if((pData->wndProc & 0xFFFF0000) == 0xFFFF0000)
 		pData->wndProc = pData->gwlW(pData->hwnd, GWLP_WNDPROC);
 	if(pData->isDialog == true) {
 		pData->dlgProc = pData->gwlA(pData->hwnd, DWLP_DLGPROC);

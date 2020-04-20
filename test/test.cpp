@@ -145,7 +145,7 @@ void SetDlgItemHex(HWND hwnd, DWORD ctrlID, T data)
 	else SetDlgItemHex32(hwnd, ctrlID, data);
 }
 
-void hexView_addrcb(void* ctx, ADDR_T addr, DWORD data)
+void hexView_addrcb(void* ctx, ADDR_T addr, ADDR_T data)
 {
 	SetDlgItemHex((HWND)ctx, IDC_ADDR, addr);
 	SetDlgItemHex((HWND)ctx, IDC_VALUE, data);
@@ -219,7 +219,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			ComboBox_ResetContent(hCombo);
 			for(int i = 0; i < wInfo.wndExtra/4; i++) {
 				char buff[16]; sprintf(buff, "0x%08X", wInfo.extra[i]);
-				ComboBox_AddString(hCombo, buff); }
+				SendMessageA(hCombo, CB_ADDSTRING, 0, (LPARAM)buff); }
 			ComboBox_SetCurSel(hCombo, 0);
 				
 			// final steps
