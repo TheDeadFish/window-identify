@@ -43,7 +43,7 @@ LRESULT CALLBACK WinIdentify::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 	if(msg == WM_CREATE)
 	{
 		CREATESTRUCT& cs = *(CREATESTRUCT*)lParam;
-		SetWindowLong(hwnd, GWL_USERDATA, (LONG)cs.lpCreateParams);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)cs.lpCreateParams);
 		obj = (WinIdentify*)cs.lpCreateParams;
 
 		// setup object
@@ -55,7 +55,7 @@ LRESULT CALLBACK WinIdentify::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 		return TRUE;
 	}
 	
-	obj = (WinIdentify*)GetWindowLong(hwnd, GWL_USERDATA);
+	obj = (WinIdentify*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	switch(msg)
 	{
 	case WM_PAINT:{
@@ -123,12 +123,10 @@ LRESULT CALLBACK WinIdentify::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
 			// send notifacation
 			if(selHwnd)
 			{
-				NMHDR nMhdr;
-				nMhdr.hwndFrom = hwnd;
-				nMhdr.idFrom = GetDlgCtrlID(hwnd);
-				nMhdr.code = (UINT)selHwnd;
+				int idFrom = GetDlgCtrlID(hwnd);
+				MNWND nMhdr = {{hwnd, idFrom, 0}, selHwnd};
 				SendMessage( GetParent(hwnd), WM_NOTIFY,
-					nMhdr.idFrom, (LPARAM)&nMhdr);
+					nMhdr.nmh.idFrom, (LPARAM)&nMhdr);
 			}
 		}
 	

@@ -6,26 +6,30 @@
 
 struct HexView
 {
+	typedef SIZE_T ADDR_T;
+
+
+
 	// public interface
 	HWND hwnd; enum { READ_LEN = 19 };
-	typedef void (*ReadDataCb)(void* ctx, DWORD addr, BYTE* data);
-	typedef void (*AddrChngCb)(void* ctx, DWORD addr, DWORD data);
+	typedef void (*ReadDataCb)(void* ctx, ADDR_T addr, BYTE* data);
+	typedef void (*AddrChngCb)(void* ctx, ADDR_T addr, DWORD data);
 	static HexView* create(HWND hwnd, void* ctx,
 		ReadDataCb datacb_, AddrChngCb addrcb_);
 	static HexView* replace(HWND hwnd, void* ctx,
 		ReadDataCb datacb_, AddrChngCb addrcb_);
-	void setAddress(DWORD newAddr);
+	void setAddress(ADDR_T newAddr);
 		
 //private:
 	RECT rect; void* ctx;
 	ReadDataCb datacb; AddrChngCb addrcb;
-	int scrnAddr, curAddr, nRows, rowHeight;
+	ADDR_T scrnAddr, curAddr; DWORD nRows, rowHeight;
 	SIZE textSz; void resize(WINDOWPOS* wndPos);
 	void keybPress(WPARAM vKey); 
 	void clampScrn(void); void redraw(HDC hdc);
 	void setColor(HDC hdc, char sel);
 	void drawHexLine(HDC hdc, int x, int y,
-		char focusCol, int cursor, DWORD addr, BYTE* data);
+		char focusCol, int cursor, ADDR_T addr, BYTE* data);
 	static LRESULT CALLBACK WndProc(HWND hwnd,
 		UINT msg, WPARAM wParam, LPARAM lParam);
 };
@@ -90,7 +94,7 @@ void HexView::resize(WINDOWPOS* wndPos)
 	this->clampScrn();
 }
 
-void HexView::setAddress(DWORD newAddr)
+void HexView::setAddress(SIZE_T newAddr)
 {
 	curAddr = newAddr; 
 	scrnAddr = newAddr&~15;
@@ -99,9 +103,9 @@ void HexView::setAddress(DWORD newAddr)
 
 void HexView::clampScrn(void)
 {
-	int limitMax = curAddr & ~15;
+	ADDR_T limitMax = curAddr & ~15;
 	if(scrnAddr > limitMax) scrnAddr = limitMax;
-	int limitMin = limitMax - (nRows-1)*16;
+	ADDR_T limitMin = limitMax - (nRows-1)*16;
 	if(scrnAddr < limitMin) scrnAddr = limitMin;
 }
 
@@ -141,7 +145,7 @@ void HexView::redraw(HDC hdc)
 #include <conio.h>
 
 void HexView::drawHexLine(HDC hdc, int x, int y,
-	char focusCol, int cursor, DWORD addr, BYTE* data)
+	char focusCol, int cursor, ADDR_T addr, BYTE* data)
 {
 	char buff[16];
 	MoveToEx(hdc, x, y, 0); this->setColor(hdc, 0); 

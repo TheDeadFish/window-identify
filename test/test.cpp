@@ -6,6 +6,7 @@
 #include <process.h>
 #include "hexView.cpp"
 
+typedef HexView::ADDR_T ADDR_T;
 
 RECT GetChildRect(HWND hWnd)
 {
@@ -124,21 +125,35 @@ LRESULT CALLBACK ButtonProc(
 	return 0;
 }
 
-void SetDlgItemHex(HWND hwnd, DWORD ctrlID, DWORD data)
+void SetDlgItemHex32(HWND hwnd, DWORD ctrlID, DWORD data)
 {
 	char buff[16]; sprintf(buff, "0x%08X", data);
 	SetDlgItemTextA(hwnd, ctrlID, buff);
 }
 
-void hexView_addrcb(void* ctx, DWORD addr, DWORD data)
+void SetDlgItemHex64(HWND hwnd, DWORD ctrlID, SIZE_T data)
+{
+	char buff[32]; sprintf(buff, "0x%08I64X", data);
+	SetDlgItemTextA(hwnd, ctrlID, buff);
+}
+
+template <class T>
+void SetDlgItemHex(HWND hwnd, DWORD ctrlID, T data) 
+{
+	if constexpr(sizeof(T) == 8)
+		SetDlgItemHex64(hwnd, ctrlID, data);
+	else SetDlgItemHex32(hwnd, ctrlID, data);
+}
+
+void hexView_addrcb(void* ctx, ADDR_T addr, DWORD data)
 {
 	SetDlgItemHex((HWND)ctx, IDC_ADDR, addr);
 	SetDlgItemHex((HWND)ctx, IDC_VALUE, data);
 }
 
-void hexView_readcb(void* ctx, DWORD addr, BYTE* data)
+void hexView_readcb(void* ctx, ADDR_T addr, BYTE* data)
 {
-	DWORD bytesRead = 0;
+	SIZE_T bytesRead = 0;
 	ReadProcessMemory(lastProcess, (LPCVOID)addr, data,
 		HexView::READ_LEN, &bytesRead);
 	for(int i = bytesRead; i < HexView::READ_LEN; i++) { data[i] = 0xAA; }
@@ -165,9 +180,8 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_NOTIFY:
 		switch(wParam)
 		{
-		case IDC_IDENTIFY:{
-			NMHDR& nMhdr = *(NMHDR*)lParam;
-			lastHwnd = (HWND)nMhdr.code;}
+		case IDC_IDENTIFY:
+			lastHwnd = wi.getNotify(lParam);
 		case IDC_PARENT:{
 			CloseHandle(lastProcess);
 			WindowInfo wInfo;
@@ -185,7 +199,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			}
 			
 			// update the edit control
-			SetDlgItemHex(hwndDlg, IDC_HWND, (DWORD)lastHwnd);
+			SetDlgItemHex(hwndDlg, IDC_HWND, (SIZE_T)lastHwnd);
 			SetDlgItemTextA(hwndDlg, IDC_CLASS, wInfo.className);
 			SetDlgItemHex(hwndDlg, IDC_CTLID, wInfo.ctrlId);
 			SetDlgItemHex(hwndDlg, IDC_STYLE, wInfo.style);
@@ -224,8 +238,8 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		wi.replace(hwndDlg, GetDlgItem(hwndDlg, IDC_IDENTIFY));
 		
 		// setup parent button
-		SetWindowLong(GetDlgItem(hwndDlg, IDC_PARENT),
-			GWL_WNDPROC, (INT_PTR)&ButtonProc);
+		SetWindowLongPtr(GetDlgItem(hwndDlg, IDC_PARENT),
+			GWLP_WNDPROC, (INT_PTR)&ButtonProc);
 		hIcon = (HICON)LoadImageA(GetModuleHandle(NULL),
 			"IDI_ICON1", IMAGE_ICON, 0, 0, LR_SHARED);
 		mouseOver = false;

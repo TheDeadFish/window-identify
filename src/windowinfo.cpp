@@ -102,7 +102,7 @@ HANDLE WindowInfo::get(HWND hwnd)
 	VirtualFreeEx(hProcess, pMemRemote, 0, MEM_RELEASE );
 	
 	// get remaining information
-	HMODULE hModule = (HMODULE)GetWindowLongPtr(hwnd, GWL_HINSTANCE);
+	HMODULE hModule = (HMODULE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 	GetModuleFileNameExA(hProcess, 0, procName, MAX_PATH);
 	GetModuleFileNameExA(hProcess, hModule, modName, MAX_PATH);
 	ctrlId = GetWindowLong(hwnd, GWLP_ID);
@@ -110,7 +110,7 @@ HANDLE WindowInfo::get(HWND hwnd)
 	procModInfo(hProcess, dlgProc);
 	style = GetWindowLong(hwnd, GWL_STYLE);
 	exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-	wndData = GetWindowLong(hwnd, GWL_USERDATA);
-	dlgData = GetWindowLong(hwnd, DWL_USER);	
+	wndData = GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	dlgData = GetWindowLongPtr(hwnd, DWLP_USER);	
 	return hProcess;
 }

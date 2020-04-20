@@ -14,6 +14,10 @@ public:
 	bool enumChildren;
 	HWND hwnd;
 	
+	struct MNWND { NMHDR nmh; HWND hwnd; };
+	static HWND getNotify(LPARAM lParam) {
+		return ((MNWND*)lParam)->hwnd; }
+	
 private:
 	class WinCollide
 	{

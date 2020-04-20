@@ -1,2 +1,2 @@
-call cmake_gcc
+call cmake_gcc x64
 
